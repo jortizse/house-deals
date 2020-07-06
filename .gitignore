@@ -65,6 +65,11 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 
+# PyCharm stuff
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+
 # Scrapy stuff:
 .scrapy
 

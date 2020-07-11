@@ -1,5 +1,6 @@
 beautifulsoup4
-itertools
 pandas
+pandas-profiling
 requests
 seaborn
+tqdm

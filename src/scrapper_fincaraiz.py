@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 class ScrapperFincaraiz:
 
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, sleep_minutes=1):
         self.base_url = "https://www.fincaraiz.com.co/"
         self.attributes = ['Code', 'Title', 'Sector', 'Neighborhood',
                            'Price (COP)', 'Area', 'Num. rooms', 'Update Date',
@@ -18,6 +18,7 @@ class ScrapperFincaraiz:
         self.headers = ({'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) '
                                        'AppleWebKit/537.36 (KHTML, like Gecko) '
                                        'Chrome/41.0.2228.0 Safari/537.36'})
+        self.sleep = sleep_minutes
 
     def search_properties(self):
         """Execute a search in the website under certain parameters (e.g., city
@@ -98,12 +99,11 @@ class ScrapperFincaraiz:
                     ignore_index=True, sort=False)
             except:
                 pass
-            sleep(1)
+            sleep(self.sleep)
         return properties_df
 
     def parse_search_results(self, reference_url, save_file_name,
-                             max_pages=np.inf) -> \
-            pd.DataFrame:
+                             max_pages=np.inf) -> pd.DataFrame:
         """"""
         properties_df = pd.DataFrame(columns=self.attributes)
         page = 1

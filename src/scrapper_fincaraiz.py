@@ -5,13 +5,14 @@ import numpy as np
 import pandas as pd
 from time import sleep
 from tqdm import tqdm
+import sys
 
 
 class ScrapperFincaraiz:
 
     def __init__(self, verbose=True, sleep_minutes=1):
         self.base_url = "https://www.fincaraiz.com.co/"
-        self.attributes = ['Code', 'Title', 'Sector', 'Neighborhood',
+        self.attributes = ['Code', 'Title', 'Type', 'Sector', 'Neighborhood',
                            'Price (COP)', 'Area', 'Num. rooms', 'Update Date',
                            'City', 'Province', 'URL']
         self.verbose = verbose
@@ -34,7 +35,7 @@ class ScrapperFincaraiz:
             today = date.today()
             current_year = today.year
             new_date = datetime.strptime(f'{day_month}/{current_year}',
-                                         '%d/%m/%Y')
+                                         '%d/%m/%Y').date()
             if new_date > today:
                 new_date.replace(year=current_year - 1)
             return new_date
@@ -61,22 +62,25 @@ class ScrapperFincaraiz:
             local_code = info[2]
             return tuple(location) + (up_date, local_code)
 
-        price = int(property_container.find_all('meta')[1]['content'])
+        property_details = property_container.find_all('a')[0]
+        property_page = property_details['href']
+        title = property_details.findChild(class_='h2-grid').text.strip()
+        type_ = title.split(' ')[0]
+        property_page_url = self.base_url + property_page
+        price = int(property_container.find_all(
+            'meta', itemprop='price')[0]['content'])
         text = property_container.find_all(
             'li', class_='surface li_advert')[0].text.split('\n')
-        area = text[1].replace(" ", "").replace(",", ".")
+        area = text[1].replace(" ", "").replace(".", "").replace(",", ".")
         area = float(area[:area.find('m')])
         try:
             num_rooms = int(text[3][0])
         except ValueError:
             num_rooms = ''
-        property_details = property_container.find_all('a')[0]
-        property_page = property_details['href']
-        title = property_details.findChild(class_='h2-grid').text.strip()
-        property_page_url = self.base_url + property_page
+
         parsed_data = parse_property_page(property_page_url, self.headers)
         dep, city, sector, neighborhood, update_date, code = parsed_data
-        data = [code, title, sector, neighborhood, price, area,
+        data = [code, title, type_, sector, neighborhood, price, area,
                 num_rooms, update_date, city, dep, property_page_url]
         return data
 
@@ -97,7 +101,8 @@ class ScrapperFincaraiz:
                 properties_df = properties_df.append(
                     pd.DataFrame([property_data], columns=self.attributes),
                     ignore_index=True, sort=False)
-            except:
+            except Exception as e:
+                print(e)
                 pass
             sleep(self.sleep)
         return properties_df

@@ -28,9 +28,6 @@ class FincaraizScrapper:
         self.website.set_search_page(search_type, city)
         self.website.get_properties()
 
-        first_url = ''
-        return base_url, first_url
-
     
         # dep, city, sector, neighborhood, update_date, code = parsed_data
         # data = [code, title, type_, sector, neighborhood, price, area,

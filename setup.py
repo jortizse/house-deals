@@ -2,8 +2,9 @@ import os
 from setuptools import setup, find_packages
 
 base_dependencies = ['beautifulsoup4', 'pandas']
-dev_dependencies = ['pandas-profiling',
-                    'pytest'
+dev_dependencies = ['jupyterlab',
+                    'pandas-profiling',
+                    'pytest',
                     'requests',
                     'seaborn',
                     'tqdm']
